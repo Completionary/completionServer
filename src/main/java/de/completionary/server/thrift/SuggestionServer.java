@@ -1,6 +1,7 @@
 package de.completionary.server.thrift;
 
 import de.completionary.proxy.thrift.services.SuggestionService;
+import de.completionary.server.TServlet;
 
 public class SuggestionServer extends TServlet {
 

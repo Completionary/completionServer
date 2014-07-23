@@ -1,4 +1,4 @@
-package de.completionary.server.thrift;
+package de.completionary.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +32,7 @@ import org.apache.thrift.transport.TTransportFactory;
  * <pre>
  * 
  * 
+ * 
  * public class CalculatorTServlet extends TServlet {
  * 
  *     public CalculatorTServlet() {
@@ -56,16 +57,14 @@ import org.apache.thrift.transport.TTransportFactory;
  * </p>
  * 
  * <p>
- * This code is based heavily on
- * {@link com.facebook.thrift.server.TSimpleServer}.
+ * This code is based heavily on {@link gist.github.com/pieceable/430784}.
  * </p>
  * 
- * @author Tom White
- * @author Fred Potter
+ * @author Jonas Kunze
  */
 public class TServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 9110289251730217130L;
+    private static final long serialVersionUID = -7641009085670384001L;
 
     protected TProcessor processor_ = null;
 
