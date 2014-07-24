@@ -12,6 +12,15 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Completionary Proxy</name>
 
+
+  <!-- Metalcon repository to resolve dependencies from -->
+  <repositories>
+    <repository>
+      <id>metalcon-depend</id>
+      <url>http://develop.metalcon.de:8080/mvn/</url>
+    </repository>
+  </repositories>
+  
 	<properties>
 		<tomcat.deploy-plugin.path>/completionserver</tomcat.deploy-plugin.path>
 		<!-- Main Class for execution -->
@@ -41,7 +50,7 @@
 		<dependency>
 			<groupId>de.completionary.proxy</groupId>
 			<artifactId>proxy</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
