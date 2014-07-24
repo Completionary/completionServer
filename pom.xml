@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>de.completionary.proxy</groupId>
 			<artifactId>proxy</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 
 		<dependency>
