@@ -7,7 +7,7 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
 
-import de.completionary.proxy.thrift.services.SuggestionService;
+import de.completionary.proxy.thrift.services.suggestion.SuggestionService;
 import de.completionary.server.thrift.SuggestionHandler;
 
 public class SuggestionServer {

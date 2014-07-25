@@ -6,8 +6,8 @@ import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;
 
 import de.completionary.proxy.elasticsearch.SuggestionIndex;
-import de.completionary.proxy.thrift.services.Suggestion;
-import de.completionary.proxy.thrift.services.SuggestionService;
+import de.completionary.proxy.thrift.services.suggestion.Suggestion;
+import de.completionary.proxy.thrift.services.suggestion.SuggestionService;
 
 public class SuggestionHandler implements SuggestionService.AsyncIface {
 
