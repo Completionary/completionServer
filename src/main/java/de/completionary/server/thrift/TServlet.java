@@ -1,4 +1,4 @@
-package de.completionary.server;
+package de.completionary.server.thrift;
 
 import java.io.IOException;
 import java.io.InputStream;

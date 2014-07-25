@@ -4,7 +4,7 @@
 	version="2.5">
 	<servlet>
 		<servlet-name>suggestion</servlet-name>
-		<servlet-class>de.completionary.server.thrift.SuggestionServer</servlet-class>
+		<servlet-class>de.completionary.server.SuggestionHttpServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
