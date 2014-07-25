@@ -12,37 +12,43 @@ import junit.framework.Assert;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.completionary.proxy.elasticsearch.SuggestionIndex;
+import de.completionary.proxy.helper.ProxyOptions;
 import de.completionary.proxy.thrift.services.suggestion.Suggestion;
 import de.completionary.proxy.thrift.services.suggestion.SuggestionService;
 
 public class SuggestionServiceTest {
 
-    static TTransport transport;
+    TTransport transport;
 
-    static SuggestionService.Client client;
+    SuggestionService.Client client;
 
     private static String indexID = "";
 
-    @BeforeClass
-    public static void setUpBeforeClass() {
+    @Before
+    public void setUp() throws Exception {
         Random r = new Random();
         indexID = "testindex" + r.nextInt();
 
-        SuggestionServer.startNewInstance();
+        /*
+         * Start the thrift server in a new thread
+         */
+        (new SuggestionServer()).start();
 
-        transport = new TFramedTransport(new TSocket("localhost", 9090));
-        TProtocol protocol = new TBinaryProtocol(transport);
+        transport =
+                new TFramedTransport(new TSocket("localhost",
+                        ProxyOptions.SUGGESTION_SERVER_PORT));
+        TProtocol protocol = new TCompactProtocol(transport);
 
         client = new SuggestionService.Client(protocol);
         while (true) {
@@ -59,8 +65,8 @@ public class SuggestionServiceTest {
         }
     }
 
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         transport.close();
         SuggestionIndex.delete(indexID);
     }

@@ -13,14 +13,14 @@
 	<name>Completionary Proxy</name>
 
 
-  <!-- Metalcon repository to resolve dependencies from -->
-  <repositories>
-    <repository>
-      <id>metalcon-depend</id>
-      <url>http://develop.metalcon.de:8080/mvn/</url>
-    </repository>
-  </repositories>
-  
+	<!-- Metalcon repository to resolve dependencies from -->
+	<repositories>
+		<repository>
+			<id>metalcon-depend</id>
+			<url>http://develop.metalcon.de:8080/mvn/</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<tomcat.deploy-plugin.path>/completionserver</tomcat.deploy-plugin.path>
 		<!-- Main Class for execution -->
@@ -129,6 +129,20 @@
 						<port>8000</port>
 					</httpConnector>
 					<scanIntervalSeconds>3</scanIntervalSeconds>
+				</configuration>
+			</plugin>
+
+			<!-- Java 1.7 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${java.compiler-plugin.version}</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
 
