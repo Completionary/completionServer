@@ -22,6 +22,7 @@
 
 		<!-- version of Tomcat deployment plugin -->
 		<tomcat.deploy-plugin.version>2.2</tomcat.deploy-plugin.version>
+		<tomcat.deploy-plugin.path>/completionServer</tomcat.deploy-plugin.path>
 
 		<!-- version of Jetty server plugin -->
 		<jetty-plugin.version>9.2.1.v20140609</jetty-plugin.version>
