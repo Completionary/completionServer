@@ -7,11 +7,10 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.completionary.proxy</groupId>
+	<groupId>de.completionary.server</groupId>
 	<artifactId>proxy</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Completionary Proxy</name>
-
+	<version>0.0.1</version>
+	<name>Completionary server</name>
 
 	<!-- Metalcon repository to resolve dependencies from -->
 	<repositories>
@@ -22,10 +21,6 @@
 	</repositories>
 
 	<properties>
-		<tomcat.deploy-plugin.path>/completionserver</tomcat.deploy-plugin.path>
-		<!-- Main Class for execution -->
-		<java.exec.launcherClass>de.completionary.Main</java.exec.launcherClass>
-
 		<!-- version of Maven extension for SCP deployment -->
 		<maven.ssh-extension.version>2.6</maven.ssh-extension.version>
 		<junit.version>4.9</junit.version>
@@ -181,6 +176,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
 </project>
