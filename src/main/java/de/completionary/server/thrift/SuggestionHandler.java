@@ -41,7 +41,5 @@ public class SuggestionHandler implements SuggestionService.AsyncIface {
                 short k) throws TException {
             return SuggestionIndex.getIndex(index).findSuggestionsFor(query, k);
         }
-
     }
-
 }
