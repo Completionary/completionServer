@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import de.completionary.proxy.elasticsearch.SuggestionIndex;
 import de.completionary.proxy.helper.ProxyOptions;
+import de.completionary.proxy.thrift.services.suggestion.AnalyticsData;
 import de.completionary.proxy.thrift.services.suggestion.Suggestion;
 import de.completionary.proxy.thrift.services.suggestion.SuggestionService;
 
@@ -84,16 +85,15 @@ public class SuggestionServiceTest {
 			 * Check if the index is really truncated
 			 */
 			List<Suggestion> suggestions = client.findSuggestionsFor(indexID,
-					query, (short) 10);
+					query, (short) 10, new AnalyticsData(1, "testUserAgent"));
 			Assert.assertTrue(suggestions.isEmpty());
 
 			/*
 			 * Add an element and check if we find it in a query
 			 */
 			final CountDownLatch lock = new CountDownLatch(1);
-			index.async_addSingleTerm("1",
-					Arrays.asList(new String[] { term }), null, payload, 1,
-					new AsyncMethodCallback<Long>() {
+			index.async_addSingleTerm(1, Arrays.asList(new String[] { term }),
+					null, payload, 1, new AsyncMethodCallback<Long>() {
 
 						public void onError(Exception arg0) {
 
@@ -109,7 +109,8 @@ public class SuggestionServiceTest {
 			/*
 			 * Check if we can find the new term
 			 */
-			suggestions = client.findSuggestionsFor(indexID, query, (short) 10);
+			suggestions = client.findSuggestionsFor(indexID, query, (short) 10,
+					new AnalyticsData(1, "testUserAgent"));
 			Assert.assertEquals(suggestions.size(), 1);
 			Assert.assertEquals(suggestions.get(0).suggestion, term);
 			Assert.assertEquals(suggestions.get(0).payload, payload);
