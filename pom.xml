@@ -102,7 +102,7 @@
 				<version>${jetty-plugin.version}</version>
 				<configuration>
 					<httpConnector>
-						<port>8000</port>
+						<port>8080</port>
 					</httpConnector>
 					<scanIntervalSeconds>3</scanIntervalSeconds>
 				</configuration>

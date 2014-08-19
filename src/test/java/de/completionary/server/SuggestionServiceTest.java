@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
@@ -22,12 +23,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.completionary.proxy.elasticsearch.AnalyticsLogger;
 import de.completionary.proxy.elasticsearch.SuggestionIndex;
 import de.completionary.proxy.helper.ProxyOptions;
+import de.completionary.proxy.helper.Statistics;
 import de.completionary.proxy.thrift.services.suggestion.AnalyticsData;
 import de.completionary.proxy.thrift.services.suggestion.Suggestion;
 import de.completionary.proxy.thrift.services.suggestion.SuggestionService;
 
+/**
+ * Don't forget to start the server with mvn jetty:run before running
+ * this test!
+ */
 public class SuggestionServiceTest {
 
     TTransport transport;
@@ -36,14 +43,20 @@ public class SuggestionServiceTest {
 
     private static String indexID = "";
 
+    //    private static final String serverURL =
+    //            "http://metalcon2.physik.uni-mainz.de:"
+    //                    + ProxyOptions.SUGGESTION_SERVER_HTTP_PORT
+    //                    + "/server-0.0.1";
+    private static final String serverURL = "http://localhost:"
+            + ProxyOptions.SUGGESTION_SERVER_HTTP_PORT + "/server-0.0.1";
+
     @Before
     public void setUp() throws TTransportException {
+        AnalyticsLogger.disableLogging();
         Random r = new Random();
         indexID = "testindex" + r.nextInt();
 
-        transport =
-                new THttpClient("http://localhost:"
-                        + ProxyOptions.SUGGESTION_SERVER_HTTP_PORT);
+        transport = new THttpClient(serverURL);
         protocol = new TJSONProtocol(transport);
     }
 
@@ -72,7 +85,7 @@ public class SuggestionServiceTest {
     }
 
     @Test
-    public void perform() throws TException {
+    public void consistencyTest() throws TException {
         final String term = "asdf";
         final String query = "as";
         final String payload = "{}";
@@ -132,90 +145,103 @@ public class SuggestionServiceTest {
     public void speedTest() throws TException, InterruptedException {
         final SecureRandom r = new SecureRandom();
 
-        final int numberOfQueries = 1000;
-        final int numberOfThreads = 1;
+        //        final int numberOfThreads = 100;
+        for (int numberOfThreads = 1; numberOfThreads < 200; numberOfThreads *=
+                2) {
 
-        for (int i = 0; i < 1000; i++) { // heat up cpu
-            r.nextInt();
-        }
+            final int numberOfQueries = 50;
 
-        final long randomStartTime = System.currentTimeMillis();
-        for (int i = 0; i < numberOfQueries; i++) {
-            String query = "" + (char) ('a' + Math.abs(r.nextInt()) % 25);
-        }
-        final long randomTime = (System.currentTimeMillis() - randomStartTime);
+            for (int i = 0; i < 1000; i++) { // heat up cpu
+                r.nextInt();
+            }
 
-        final float times[] = new float[numberOfQueries];
-        final long totalTimeStart = System.currentTimeMillis();
+            final long times[] = new long[numberOfQueries * numberOfThreads];
+            final long start = System.nanoTime();
 
-        Thread[] threads = new Thread[numberOfThreads];
-        for (int thread = 0; thread != numberOfThreads; thread++) {
+            final AtomicInteger numberOfSuggestionsFound = new AtomicInteger(0);
 
-            threads[thread] = new Thread() {
+            Thread[] threads = new Thread[numberOfThreads];
+            for (int thread = 0; thread != numberOfThreads; thread++) {
+                final int ThreadID = thread;
+                threads[thread] = new Thread() {
 
-                @Override
-                public void run() {
-                    TTransport transport;
-                    try {
-                        transport =
-                                new THttpClient(
-                                        "http://localhost:"
-                                                + ProxyOptions.SUGGESTION_SERVER_HTTP_PORT);
-                        TProtocol protocol = new TJSONProtocol(transport);
+                    @Override
+                    public void run() {
+                        TTransport transport;
+                        try {
+                            transport = new THttpClient(serverURL);
+                            TProtocol protocol = new TJSONProtocol(transport);
 
-                        SuggestionService.Client client =
-                                new SuggestionService.Client(protocol);
-                        while (true) {
-                            try {
-                                transport.open();
-                                break;
-                            } catch (TTransportException e) {
-                                e.printStackTrace();
+                            SuggestionService.Client client =
+                                    new SuggestionService.Client(protocol);
+                            while (true) {
                                 try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e1) {
+                                    transport.open();
+                                    break;
+                                } catch (TTransportException e) {
+                                    e.printStackTrace();
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e1) {
+                                    }
                                 }
                             }
-                        }
-                        
-                        final SecureRandom r = new SecureRandom();
-                        for (int i = 0; i < numberOfQueries; i++) {
-                            final int queryID = i;
-                            String query =
-                                    ""
-                                            + (char) ('a' + Math.abs(r
-                                                    .nextInt()) % 25);
-                            final long startTime = System.currentTimeMillis();
-                            try {
-                                List<Suggestion> suggestions =
-                                        client.findSuggestionsFor(indexID,
-                                                query, (short) 15,
-                                                new AnalyticsData());
-                            } catch (TException e) {
-                                e.printStackTrace();
+
+                            final SecureRandom r = new SecureRandom();
+                            for (int i = 0; i < numberOfQueries; i++) {
+                                final int queryID = i;
+                                String query =
+                                        ""
+                                                + (char) ('a' + Math.abs(r
+                                                        .nextInt()) % 25);
+
+                                try {
+                                    //                                wieso brauche ich über thrift nur 4ms, direkt jedoch 5,3...
+                                    //                                SuggestionIndex client =
+                                    //                                        SuggestionIndex
+                                    //                                                .getIndex("wikipediaindex");
+                                    final long startTime = System.nanoTime();
+                                    List<Suggestion> result =
+                                            client.findSuggestionsFor(
+                                                    "wikipediaindex", query,
+                                                    (short) 15,
+                                                    new AnalyticsData());
+                                    times[ThreadID * numberOfQueries + queryID] =
+                                            System.nanoTime() - startTime;
+                                    numberOfSuggestionsFound.addAndGet(result
+                                            .size());
+                                } catch (TException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
-                            float time =
-                                    (System.currentTimeMillis() - startTime);
-                            times[queryID] = time;
+                        } catch (TTransportException e1) {
+                            e1.printStackTrace();
                         }
-                    } catch (TTransportException e1) {
-                        e1.printStackTrace();
                     }
-                }
-            };
-            threads[thread].start();
-        }
+                };
+                threads[thread].start();
+            }
 
-        for (int thread = 0; thread != numberOfThreads; thread++) {
-            threads[thread].join();
-        }
+            for (int thread = 0; thread != numberOfThreads; thread++) {
+                threads[thread].join();
+            }
 
-        float time =
-                (System.currentTimeMillis() - totalTimeStart - randomTime)
-                        * 1000 / (float) numberOfQueries;
-        System.out.println("Average per query time: " + time + " µs");
-        for (float f : times) {
-            System.out.println(f);
+            double requestsPerSecond =
+                    (double) times.length / (System.nanoTime() - start) * 1E9;
+
+            double averageTimePerRequestms =
+                    Statistics.calculateAverage(times) / 1E6;
+            double standardDeviation =
+                    Statistics.calculateStandardDeviation(times) / 1E6;
+
+            //        System.out.println("Request rate: " + requestsPerSecond + " Hz");
+            //        System.out.println("found " + numberOfSuggestionsFound
+            //                + " suggestions in " + times.length + " requests) ");
+            //        System.out.println("(" + averageTimePerRequestms + "+-"
+            //                + standardDeviation + ") ms per request average");
+            System.out.println(numberOfThreads + "\t" + averageTimePerRequestms
+                    + "\t" + standardDeviation + "\t" + requestsPerSecond);
         }
     }
 }
