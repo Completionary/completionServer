@@ -47,7 +47,7 @@ public class SuggestionServiceTest {
 		(new SuggestionServer()).start();
 
 		transport = new TFramedTransport(new TSocket("localhost",
-				ProxyOptions.SUGGESTION_SERVER_PORT));
+				ProxyOptions.SUGGESTION_SERVER_BINARY_PORT));
 		TProtocol protocol = new TBinaryProtocol(transport);
 
 		client = new SuggestionService.Client(protocol);

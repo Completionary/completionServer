@@ -18,7 +18,7 @@ public class SuggestionServer extends Thread {
 		try {
 
 			TNonblockingServerTransport trans = new TNonblockingServerSocket(
-					ProxyOptions.SUGGESTION_SERVER_PORT);
+					ProxyOptions.SUGGESTION_SERVER_BINARY_PORT);
 			TNonblockingServer.Args args = new TNonblockingServer.Args(trans);
 			args.transportFactory(new TFramedTransport.Factory());
 			args.protocolFactory(new TBinaryProtocol.Factory());
