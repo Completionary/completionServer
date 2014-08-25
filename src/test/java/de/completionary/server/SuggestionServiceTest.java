@@ -23,7 +23,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.completionary.proxy.analytics.AnalyticsLogger;
 import de.completionary.proxy.elasticsearch.SuggestionIndex;
 import de.completionary.proxy.helper.ProxyOptions;
 import de.completionary.proxy.helper.Statistics;
@@ -52,7 +51,7 @@ public class SuggestionServiceTest {
 
     @Before
     public void setUp() throws TTransportException {
-        AnalyticsLogger.disableLogging();
+        ProxyOptions.ENABLE_LOGGIN = false;
         Random r = new Random();
         indexID = "testindex" + r.nextInt();
 
